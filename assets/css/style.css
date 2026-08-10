@@ -36,6 +36,12 @@
 
   --chrome-gradient: linear-gradient(115deg, #ffffff 0%, #d3d6dc 18%, #6c6e76 40%, #f4f5f7 56%, #999ba2 74%, #ececed 100%);
 
+  /* Semi-transparent panel backgrounds so the fixed video behind the
+     page stays visible (per the brief: content should scroll "through"
+     it) while text stays legible everywhere below the hero. */
+  --panel-bg: rgba(9, 10, 13, 0.9);
+  --panel-bg-alt: rgba(14, 15, 20, 0.88);
+
   --max-width: 1240px;
   --ease: cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -51,9 +57,7 @@ html.lenis { scroll-behavior: auto; }
 
 body {
   margin: 0;
-  background:
-    radial-gradient(120% 60% at 50% -10%, rgba(255, 255, 255, 0.05), transparent 60%),
-    var(--bg);
+  background: var(--bg);
   color: var(--text);
   font-family: var(--font-body);
   font-size: 16px;
@@ -62,6 +66,65 @@ body {
 }
 
 img, svg { max-width: 100%; display: block; }
+
+/* ===================================================================
+   Fixed video background — pinned behind the whole document, every
+   section scrolls over it (not just the hero)
+   =================================================================== */
+.site-video-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+.site-video-bg video,
+.site-video-fallback {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  /* contain (not cover) keeps the video's full composition intact —
+     cover crops a 9:16 clip so aggressively in a landscape viewport
+     that the ring balloons to fill the whole screen, leaving no clear
+     band for copy. Contain letterboxes instead (bars match --bg, so
+     they read as intentional stage space, not empty gutters). */
+  object-fit: contain;
+  object-position: center center;
+}
+
+.site-video-bg video { display: block; }
+
+.site-video-fallback {
+  display: none;
+  background: var(--bg);
+  align-items: center;
+  justify-content: center;
+}
+.site-video-fallback .ring-orbit {
+  width: min(48vw, 480px);
+  animation: ring-rotate 60s linear infinite;
+}
+.site-video-fallback .ring-svg { width: 100%; height: 100%; }
+.site-video-fallback .ring-sensor { filter: drop-shadow(0 0 8px var(--accent)); }
+.site-video-fallback .ring-halo { filter: blur(14px); opacity: 0.8; }
+
+@keyframes ring-rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Darkens top/bottom (where copy sits) more than the vertical center
+   (where the product sits), and adds an overall vignette so every
+   section's text stays legible against the moving footage. */
+.site-video-scrim {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(to bottom, rgba(6, 7, 9, 0.72) 0%, rgba(6, 7, 9, 0.1) 26%, rgba(6, 7, 9, 0.05) 60%, rgba(6, 7, 9, 0.75) 88%, rgba(6, 7, 9, 0.92) 100%),
+    radial-gradient(80% 60% at 50% 45%, transparent 40%, rgba(6, 7, 9, 0.5) 100%);
+}
 
 h1, h2, h3 {
   font-family: var(--font-display);
@@ -236,123 +299,62 @@ section[id] { scroll-margin-top: 84px; }
 .nav-toggle span { width: 22px; height: 1.5px; background: var(--text); display: block; transition: transform 0.25s, opacity 0.25s; }
 
 /* ===================================================================
-   Hero
+   Hero — copy only. The fixed .site-video-bg supplies the imagery;
+   text sits in a top band and a bottom band, leaving the vertical
+   center (where the ring sits in frame) uncovered.
    =================================================================== */
 .hero {
   position: relative;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  gap: 0;
   padding: 128px 32px 0;
-  overflow: hidden;
-  background:
-    radial-gradient(55% 45% at 50% 38%, rgba(201, 162, 75, 0.07), transparent 70%),
-    var(--bg);
+  background: transparent;
 }
 
-.hero-eyebrow {
+.hero-top {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  width: 100%;
   text-align: center;
-  margin: 0 0 8px;
 }
 
-.hero-frame {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 58vh;
-  perspective: 1400px;
-  will-change: transform, opacity;
-}
+.hero-eyebrow { text-align: center; margin: 0 0 12px; }
 
 .hero-title {
-  font-size: clamp(4.5rem, 17vw, 13rem);
+  font-size: clamp(2.8rem, 8vw, 6.5rem);
   text-align: center;
-  line-height: 0.86;
+  line-height: 0.96;
   letter-spacing: -0.02em;
+}
+
+.hero-bottom {
+  max-width: var(--max-width);
+  margin: auto auto 0;
   width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  align-items: end;
+  padding: 28px 0 40px;
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
 }
 
-.hero-media {
-  position: absolute;
-  z-index: 2;
-  width: min(21vw, 300px);
-  aspect-ratio: 9 / 16;
-  pointer-events: auto;
-  filter: drop-shadow(0 30px 70px rgba(0, 0, 0, 0.6));
-  perspective: 900px;
-  transform-style: preserve-3d;
-  animation: hero-media-in 1.3s var(--ease) both;
-  animation-delay: 0.4s;
-}
-
-/* Apple-style staged entrance: the ring turns in with real depth
-   while the surrounding copy settles in behind it */
-@keyframes hero-media-in {
-  from { opacity: 0; transform: translateY(30px) scale(0.88) rotateY(-16deg); }
-  to { opacity: 1; transform: translateY(0) scale(1) rotateY(0deg); }
-}
 @keyframes hero-text-in {
   from { opacity: 0; transform: translateY(24px); }
   to { opacity: 1; transform: translateY(0); }
 }
 .hero-eyebrow { animation: hero-text-in 0.9s var(--ease) both; animation-delay: 0.05s; }
 .hero-title { animation: hero-text-in 1s var(--ease) both; animation-delay: 0.15s; }
-.hero-tagline { animation: hero-text-in 0.9s var(--ease) both; animation-delay: 0.62s; }
-.hero-caption-right { animation: hero-text-in 0.9s var(--ease) both; animation-delay: 0.74s; }
+.hero-tagline { animation: hero-text-in 0.9s var(--ease) both; animation-delay: 0.3s; }
+.hero-caption-right { animation: hero-text-in 0.9s var(--ease) both; animation-delay: 0.42s; }
 
 @media (prefers-reduced-motion: reduce) {
-  .hero-media, .hero-eyebrow, .hero-title, .hero-tagline, .hero-caption-right {
+  .hero-eyebrow, .hero-title, .hero-tagline, .hero-caption-right {
     animation: none;
     opacity: 1;
     transform: none;
   }
-}
-
-.hero-media-inner {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  transform: rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg));
-  transition: transform 0.4s var(--ease);
-  mask-image: radial-gradient(ellipse 62% 58% at 50% 48%, #000 48%, transparent 82%);
-  -webkit-mask-image: radial-gradient(ellipse 62% 58% at 50% 48%, #000 48%, transparent 82%);
-}
-
-.hero-video,
-.hero-media-fallback {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
-.hero-video { display: block; }
-.hero-media-fallback { display: none; }
-.hero-media-fallback .ring-orbit { display: flex; align-items: center; justify-content: center; height: 100%; }
-
-.ring-orbit { width: 100%; height: 100%; animation: ring-rotate 60s linear infinite; }
-.ring-svg { width: 100%; height: 100%; }
-.ring-sensor { filter: drop-shadow(0 0 8px var(--accent)); }
-.ring-halo { filter: blur(14px); opacity: 0.8; }
-
-@keyframes ring-rotate {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-.hero-caption {
-  max-width: var(--max-width);
-  width: 100%;
-  margin: 40px auto 0;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 40px;
-  align-items: end;
-  padding: 28px 0;
-  border-top: 1px solid var(--border);
 }
 
 .hero-tagline {
@@ -363,6 +365,7 @@ section[id] { scroll-margin-top: 84px; }
   line-height: 1.15;
   margin: 0;
   max-width: 14ch;
+  text-shadow: 0 2px 20px rgba(0, 0, 0, 0.6);
 }
 
 .hero-sub {
@@ -371,6 +374,7 @@ section[id] { scroll-margin-top: 84px; }
   font-size: 1rem;
   line-height: 1.7;
   margin-bottom: 24px;
+  text-shadow: 0 2px 16px rgba(0, 0, 0, 0.6);
 }
 
 .hero-actions { display: flex; gap: 16px; flex-wrap: wrap; }
@@ -396,10 +400,11 @@ section[id] { scroll-margin-top: 84px; }
    Ticker
    =================================================================== */
 .ticker {
+  position: relative;
   border-top: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
   overflow: hidden;
-  background: var(--bg-alt);
+  background: var(--panel-bg-alt);
 }
 .ticker-inner {
   display: flex;
@@ -419,8 +424,8 @@ section[id] { scroll-margin-top: 84px; }
 /* ===================================================================
    Section shell
    =================================================================== */
-.section { padding: 120px 32px; }
-.section-alt { background: var(--bg-alt); }
+.section { position: relative; padding: 120px 32px; background: var(--panel-bg); }
+.section-alt { background: var(--panel-bg-alt); }
 .section-inner { max-width: var(--max-width); margin: 0 auto; }
 
 .section-head { max-width: 640px; margin-bottom: 56px; }
@@ -657,7 +662,7 @@ fieldset { border: none; padding: 0; margin: 0; display: flex; flex-direction: c
 /* ===================================================================
    Footer
    =================================================================== */
-.site-footer { border-top: 1px solid var(--border); background: var(--bg); }
+.site-footer { position: relative; border-top: 1px solid var(--border); background: var(--panel-bg); }
 .footer-inner {
   max-width: var(--max-width); margin: 0 auto;
   padding: 32px;
@@ -702,29 +707,30 @@ fieldset { border: none; padding: 0; margin: 0; display: flex; flex-direction: c
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .ring-orbit { animation: none; }
+  .site-video-fallback .ring-orbit { animation: none; }
   .chrome-text { animation: none; }
   .reveal { transition: none; opacity: 1; transform: none; transition-delay: 0s !important; }
   .btn:hover, .product-card:hover, .whatsapp-fab:hover { transform: none; }
-  .hero-frame { transform: none !important; opacity: 1 !important; }
-  .card-visual, .hero-media-inner { transition: none; transform: none !important; }
+  .hero-top, .hero-bottom { transform: none !important; opacity: 1 !important; }
+  .card-visual { transition: none; transform: none !important; }
 }
 
 /* ===================================================================
    Responsive
    =================================================================== */
 @media (max-width: 1080px) {
-  .hero-media { width: min(30vw, 240px); }
-
   .story-grid, .consult-grid, .contact-grid { grid-template-columns: 1fr; }
   .story-divider { display: none; }
 }
 
 @media (max-width: 720px) {
-  .hero { padding-top: 108px; }
-  .hero-frame { min-height: 52vh; }
-  .hero-media { width: min(42vw, 190px); }
-  .hero-caption { grid-template-columns: 1fr; gap: 24px; }
+  /* Taller than 100vh: on narrow/tall phone screens the contained
+     video (letterboxed by width) leaves less clear vertical room than
+     on desktop, so the bottom copy band needs more space below it to
+     stay clear of the ring — a little extra scroll within the hero is
+     the trade-off. */
+  .hero { padding-top: 108px; min-height: 128vh; }
+  .hero-bottom { grid-template-columns: 1fr; gap: 24px; }
   .hero-tagline { max-width: none; }
 }
 

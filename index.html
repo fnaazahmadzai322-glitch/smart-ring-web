@@ -15,6 +15,41 @@
 
 <a class="skip-link" href="#main">Skip to content</a>
 
+<!-- ============ FIXED VIDEO BACKGROUND ============
+     Pinned behind the entire page — every section scrolls over it,
+     not just the hero. A dark scrim keeps text readable throughout. -->
+<div class="site-video-bg" aria-hidden="true">
+  <video id="heroVideo" autoplay muted loop playsinline poster="assets/img/hero-poster.jpg">
+    <source src="assets/video/hero-ring.webm" type="video/webm" />
+    <source src="assets/video/hero-ring.mp4" type="video/mp4" />
+  </video>
+  <div class="site-video-fallback" id="heroFallback">
+    <div class="ring-orbit">
+      <svg class="ring-svg" viewBox="0 0 400 400">
+        <defs>
+          <linearGradient id="heroMetal" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#f4f5f7"/>
+            <stop offset="22%" stop-color="#c7ccd6"/>
+            <stop offset="45%" stop-color="#8b92a0"/>
+            <stop offset="60%" stop-color="#eef0f3"/>
+            <stop offset="78%" stop-color="#9aa0ae"/>
+            <stop offset="100%" stop-color="#dfe2e7"/>
+          </linearGradient>
+          <radialGradient id="heroGlow" cx="50%" cy="50%" r="50%">
+            <stop offset="60%" stop-color="#c9a24b" stop-opacity="0"/>
+            <stop offset="100%" stop-color="#c9a24b" stop-opacity="0.35"/>
+          </radialGradient>
+        </defs>
+        <circle class="ring-halo" cx="200" cy="200" r="168" fill="none" stroke="url(#heroGlow)" stroke-width="46"/>
+        <circle class="ring-band" cx="200" cy="200" r="150" fill="none" stroke="url(#heroMetal)" stroke-width="30"/>
+        <circle class="ring-band-inner" cx="200" cy="200" r="150" fill="none" stroke="#05060a" stroke-width="30" stroke-opacity="0.18" stroke-dasharray="1 14"/>
+        <circle class="ring-sensor" cx="200" cy="50" r="7" fill="#e8c77e"/>
+      </svg>
+    </div>
+  </div>
+  <div class="site-video-scrim"></div>
+</div>
+
 <!-- ============ NAV ============ -->
 <header class="site-header" id="siteHeader">
   <div class="header-inner">
@@ -43,49 +78,17 @@
 
 <main id="main">
 
-  <!-- ============ HERO ============ -->
+  <!-- ============ HERO ============
+       No hero-owned imagery here — the fixed .site-video-bg shows
+       through. Copy sits in a top band and a bottom band so the
+       vertical center, where the ring sits in frame, stays clear. -->
   <section class="hero" id="top">
-    <p class="eyebrow hero-eyebrow">NOVA — SMART RING COLLECTION · DUBAI, UAE</p>
-
-    <div class="hero-frame">
-      <h1 class="hero-title chrome-text">Smart<br>Ring</h1>
-
-      <div class="hero-media" id="heroMediaTilt">
-        <div class="hero-media-inner">
-          <video class="hero-video" id="heroVideo" autoplay muted loop playsinline aria-hidden="true" poster="assets/img/hero-poster.jpg">
-            <source src="assets/video/hero-ring.webm" type="video/webm" />
-            <source src="assets/video/hero-ring.mp4" type="video/mp4" />
-          </video>
-
-          <div class="hero-media-fallback" id="heroFallback" aria-hidden="true">
-            <div class="ring-orbit">
-              <svg class="ring-svg" viewBox="0 0 400 400">
-                <defs>
-                  <linearGradient id="heroMetal" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stop-color="#f4f5f7"/>
-                    <stop offset="22%" stop-color="#c7ccd6"/>
-                    <stop offset="45%" stop-color="#8b92a0"/>
-                    <stop offset="60%" stop-color="#eef0f3"/>
-                    <stop offset="78%" stop-color="#9aa0ae"/>
-                    <stop offset="100%" stop-color="#dfe2e7"/>
-                  </linearGradient>
-                  <radialGradient id="heroGlow" cx="50%" cy="50%" r="50%">
-                    <stop offset="60%" stop-color="#c9a24b" stop-opacity="0"/>
-                    <stop offset="100%" stop-color="#c9a24b" stop-opacity="0.35"/>
-                  </radialGradient>
-                </defs>
-                <circle class="ring-halo" cx="200" cy="200" r="168" fill="none" stroke="url(#heroGlow)" stroke-width="46"/>
-                <circle class="ring-band" cx="200" cy="200" r="150" fill="none" stroke="url(#heroMetal)" stroke-width="30"/>
-                <circle class="ring-band-inner" cx="200" cy="200" r="150" fill="none" stroke="#05060a" stroke-width="30" stroke-opacity="0.18" stroke-dasharray="1 14"/>
-                <circle class="ring-sensor" cx="200" cy="50" r="7" fill="#e8c77e"/>
-              </svg>
-            </div>
-          </div>
-        </div>
-      </div>
+    <div class="hero-top">
+      <p class="eyebrow hero-eyebrow">NOVA — SMART RING COLLECTION · DUBAI, UAE</p>
+      <h1 class="hero-title chrome-text">Smart Ring</h1>
     </div>
 
-    <div class="hero-caption">
+    <div class="hero-bottom">
       <p class="hero-tagline">Intelligence, forged in metal.</p>
       <div class="hero-caption-right">
         <p class="hero-sub">A sleek, sensor-laden ring finished in solid silver or 18k gold PVD — reading your heart, sleep, and energy without saying a word. Engineered for Dubai's fastest lives.</p>
