@@ -19,6 +19,14 @@
      Pinned behind the entire page — every section scrolls over it,
      not just the hero. A dark scrim keeps text readable throughout. -->
 <div class="site-video-bg" aria-hidden="true">
+  <!-- Blurred, full-bleed copy of the same footage fills edge-to-edge
+       behind the crisp product shot — a portrait clip forced to cover
+       a wide screen crops so hard the ring balloons over the copy, so
+       instead of cropping, we hide the letterbox under a soft blur. -->
+  <video class="site-video-blur" autoplay muted loop playsinline>
+    <source src="assets/video/hero-ring.webm" type="video/webm" />
+    <source src="assets/video/hero-ring.mp4" type="video/mp4" />
+  </video>
   <video id="heroVideo" autoplay muted loop playsinline poster="assets/img/hero-poster.jpg">
     <source src="assets/video/hero-ring.webm" type="video/webm" />
     <source src="assets/video/hero-ring.mp4" type="video/mp4" />
