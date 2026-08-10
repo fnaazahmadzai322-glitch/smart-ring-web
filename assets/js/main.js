@@ -75,7 +75,7 @@
   if (heroVideo && heroFallback) {
     const showFallback = () => {
       heroVideo.style.display = "none";
-      heroFallback.style.display = "block";
+      heroFallback.style.display = "flex";
     };
     heroVideo.addEventListener("error", showFallback, true);
     window.setTimeout(() => {
@@ -239,13 +239,15 @@
       });
     });
 
-    /* Hero: cinematic scroll exit, scrubbed to actual scroll position
-       via Lenis + ScrollTrigger rather than a manual rAF loop */
+    /* Hero copy: cinematic scroll exit, scrubbed to actual scroll
+       position via Lenis + ScrollTrigger. The video itself is a fixed
+       sitewide background now, so only the text bands fade/settle —
+       the footage keeps playing underneath the whole page. */
     if (!prefersReducedMotion) {
-      gsap.to(".hero-frame", {
+      gsap.to(".hero-top, .hero-bottom", {
         y: 36,
-        scale: 0.93,
-        opacity: 0.15,
+        scale: 0.96,
+        opacity: 0,
         ease: "none",
         scrollTrigger: { trigger: ".hero", start: "top top", end: "bottom top", scrub: true },
       });
@@ -275,14 +277,20 @@
 
     /* Hero scroll-exit fallback without GSAP */
     const heroSection = document.querySelector(".hero");
-    const heroFrame = document.querySelector(".hero-frame");
-    if (heroSection && heroFrame && !prefersReducedMotion) {
+    const heroTop = document.querySelector(".hero-top");
+    const heroBottom = document.querySelector(".hero-bottom");
+    if (heroSection && (heroTop || heroBottom) && !prefersReducedMotion) {
       let ticking = false;
       const updateHeroParallax = () => {
         const heroHeight = heroSection.offsetHeight || 1;
         const progress = Math.min(Math.max(-heroSection.getBoundingClientRect().top / heroHeight, 0), 1);
-        heroFrame.style.transform = `translateY(${progress * 36}px) scale(${1 - progress * 0.07})`;
-        heroFrame.style.opacity = String(1 - progress * 0.85);
+        const transform = `translateY(${progress * 36}px) scale(${1 - progress * 0.04})`;
+        const opacity = String(1 - progress);
+        [heroTop, heroBottom].forEach((el) => {
+          if (!el) return;
+          el.style.transform = transform;
+          el.style.opacity = opacity;
+        });
         ticking = false;
       };
       window.addEventListener(
@@ -299,10 +307,9 @@
     }
   }
 
-  /* Subtle 3D tilt on the hero product media and card visuals,
-     following the cursor with GSAP's easing for a springier feel —
-     skipped on touch devices and when the visitor prefers reduced
-     motion */
+  /* Subtle 3D tilt on product card visuals, following the cursor with
+     GSAP's easing for a springier feel — skipped on touch devices and
+     when the visitor prefers reduced motion */
   const enableTilt = (container, target, maxDeg) => {
     container.addEventListener("mousemove", (event) => {
       const rect = container.getBoundingClientRect();
@@ -328,10 +335,6 @@
   };
 
   if (!prefersReducedMotion && supportsHover) {
-    const heroSectionEl = document.querySelector(".hero");
-    const heroMediaInner = document.querySelector("#heroMediaTilt .hero-media-inner");
-    if (heroSectionEl && heroMediaInner) enableTilt(heroSectionEl, heroMediaInner, 9);
-
     document.querySelectorAll(".product-card").forEach((card) => {
       const visual = card.querySelector(".card-visual");
       if (visual) enableTilt(card, visual, 10);
